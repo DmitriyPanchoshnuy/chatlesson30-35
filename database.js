@@ -68,5 +68,27 @@ module.exports = {
             `INSERT INTO message (content, author) VALUES (?, ?)`,
             [msg, userId]
         )
+    },
+
+    isUserExist: async (login) => {
+        const condidate = await db.all(
+            'SELECT * FROM user WHERE login = ?',
+            [login]
+        );
+
+        return !!condidate.length;
+    },
+
+    /**
+     * Додає користувача
+     * @param {Object} user
+     * @param {string} user.login
+     * @param {string} user.password
+     */
+    addUser: async (user) => {
+        await db.run(
+            'INSERT INTO user (login, password) VALUES (?, ?)',
+            [user.login, user.password]
+        )
     }
 }

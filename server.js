@@ -9,12 +9,24 @@ const indexHTMLFile = fs.readFileSync(pathToIndex);
 
 const scriptFile = fs.readFileSync(path.join(__dirname, 'static', 'script.js'))
 const styleFile = fs.readFileSync(path.join(__dirname, 'static', 'style.css'))
+const authFile = fs.readFileSync(path.join(__dirname, 'static', 'auth.js'))
+const registerFile = fs.readFileSync(path.join(__dirname, 'static', 'register.html'))
 
 const server = http.createServer((req, res) => {
-    switch(req.url) {
-        case '/': return res.end(indexHTMLFile);
-        case '/script.js': return res.end(scriptFile);
-        case '/style.css': return res.end(styleFile);
+    if (req.method === 'GET') {
+        switch (req.url) {
+            case '/': return res.end(indexHTMLFile);
+            case '/script.js': return res.end(scriptFile);
+            case '/style.css': return res.end(styleFile);
+            case '/auth.js': return req.end(authFile);
+            case '/register': return req.end(registerFile);
+        }
+    }
+
+    if (req.method === 'POST') {
+        switch (req.url) {
+            case '/api/register': return registerUser(req, res);
+        }
     }
 
     res.statusCode = 404;
