@@ -33,6 +33,15 @@ const server = http.createServer((req, res) => {
     return res.end("ERROR 404, ТИ ХТО?")
 });
 
+function registerUser(req, res) {
+    let data = '';
+    req.on('data', (chunk) => {
+        data += chunk;
+    })
+
+    
+}
+
 server.listen(3000);
 
 const { Server } = require('socket.io');
