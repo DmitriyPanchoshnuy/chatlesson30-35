@@ -18,14 +18,15 @@ const server = http.createServer((req, res) => {
             case '/': return res.end(indexHTMLFile);
             case '/script.js': return res.end(scriptFile);
             case '/style.css': return res.end(styleFile);
-            case '/auth.js': return req.end(authFile);
-            case '/register': return req.end(registerFile);
+            case '/auth.js': return res.end(authFile);
+            case '/register': return res.end(registerFile);
         }
     }
 
     if (req.method === 'POST') {
         switch (req.url) {
             case '/api/register': return registerUser(req, res);
+            case '/api/login': return login(req, res);
         }
     }
 
@@ -39,6 +40,23 @@ function registerUser(req, res) {
         data += chunk;
     })
 
+    req.on('end', async () => {
+        try {
+            const user = JSON.parse(data);
+            if ( !user.login || !user.password) {
+                return res.end("Empty login or password!")
+            }
+
+            if ( await db.isUserExist(user.login)) {
+                return res.end("User already exist!")
+            }
+
+            await db.addUser(user);
+            return res.end("Registeration is successfull!")
+        } catch (e) {
+            return res.end('Error: ' + e);
+        }
+    })
     
 }
 
