@@ -4,6 +4,8 @@ const dbFile = "./chat.db";
 const exists = fs.existsSync(dbFile);
 const sqlite3 = require('sqlite3').verbose();
 const dbWrapper = require('sqlite')
+
+const crypto = require('crypto');
 let db;
 
 dbWrapper
@@ -102,10 +104,11 @@ module.exports = {
             throw 'Wrong login!';
         }
 
-        if (candidate.password[0] !== user.password) {
+        if (candidate[0].password !== user.password) {
             throw "Wrong password!"
         }
 
-        return candidate[0].user_id + '.' + candidate[0].login + '.' + 
+
+        return candidate[0].user_id + '.' + candidate[0].login + '.' + crypto.randomBytes(20).toString('hex');
     }
 }
