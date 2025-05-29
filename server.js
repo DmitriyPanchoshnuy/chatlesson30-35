@@ -17,6 +17,8 @@ const registerFile = fs.readFileSync(path.join(__dirname, 'static', 'register.ht
 const loginFile = fs.readFileSync(path.join(__dirname, 'static', 'login.html'))
 
 const server = http.createServer((req, res) => {
+    console.log("c: " + req.header?.cookie)
+    console.log(validAuthTokens)
     if (req.method === 'GET') {
         // Для НЕ авторизованих користувачів
         switch (req.url) {
@@ -38,9 +40,10 @@ const server = http.createServer((req, res) => {
 });
 
 function guarded(req, res) {
-    const credentionals = getCredentionals(req);
+    const credentionals = getCredentionals(req.header?.cookie);
     if (!credentionals) {
-        res.writeHead(401, {'Location': '/register'});
+        res.writeHead(302, {'Location': '/register'});
+        return res.end();
     }
 
     if (req.method === 'GET') {
@@ -55,9 +58,10 @@ function guarded(req, res) {
     return res.end('Error 404')
 }
 
-function getCredentionals(req) {
-    const cookies = cookie.parse(req.header?.cookie || '');
+function getCredentionals(c = '') {
+    const cookies = cookie.parse(c);
     const token = cookies?.token;
+    console.log("Token: " + token)
     if (!token || !validAuthTokens.includes(token)) return null;
     const [user_id, login] = token.split('.');
     if (!user_id || !login) return null;
